@@ -3,7 +3,15 @@ package br.alura.refatoracao.cap1;
 public class GeradorDeNotaFiscal {
 
 	public NotaFiscal gera(Fatura fatura) {
-		// calcula valor do imposto
+
+		NotaFiscal nf = geraNf(fatura);
+		new EnviadorDeEmail().enviaEmail(nf);
+		new NfDao().salvaNoBanco(nf);
+
+		return nf;
+	}
+
+	private NotaFiscal geraNf(Fatura fatura) {
 		double valor = fatura.getValorMensal();
 		double imposto = 0;
 		if(valor < 200) {
@@ -17,22 +25,6 @@ public class GeradorDeNotaFiscal {
 		}
 		
 		NotaFiscal nf = new NotaFiscal(valor, imposto);
-
-		// envia email
-		String msgDoEmail = "Caro cliente,<br/>";
-		msgDoEmail += "É com prazer que lhe avisamos que sua nota fiscal foi "
-				+ "gerada no valor de " + nf.getValorLiquido() + ".<br/>";
-		msgDoEmail += "Acesse o site da prefeitura e faça o download.<br/><br/>";
-		msgDoEmail += "Obrigado!";
-		
-		System.out.println(msgDoEmail);
-		
-		// salva no banco
-		String sql = "insert into notafiscal (cliente, valor)"+
-					 "values (?," + nf.getValorLiquido() + ")";
-		
-		System.out.println("Salvando no banco" + sql);
-
 		return nf;
 	}
 	
